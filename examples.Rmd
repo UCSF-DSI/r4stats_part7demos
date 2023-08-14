@@ -1,0 +1,53 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(survival)
+library(survminer)
+```
+
+```{r}
+hrs_df <- read_csv("hrs_analyze.csv")
+hrs_df
+```
+
+# Kaplan Meier Curve
+
+```{r}
+sfit <- survfit(Surv(mos_to_death, died) ~ female + bp_dx, data = hrs_df)
+sfit
+```
+
+```{r}
+ggsurvplot(sfit) + labs(x = "Months")
+```
+
+# Log Rank Test
+
+```{r}
+sdiff <- survdiff(Surv(mos_to_death, died) ~ female, data = hrs_df)
+sdiff
+```
+
+# Cox Proportion Hazard Regression
+
+```{r}
+cox_fit1 <- coxph(Surv(mos_to_death, died) ~ female, data = hrs_df)
+cox_fit1
+```
+
+```{r}
+cox_fit_multi <- coxph(Surv(mos_to_death, died) ~ female + bp_dx + depress_dx + age_2014, data = hrs_df)
+cox_fit_multi
+```
+
+## Proportional Hazards Assumption Test
+
+```{r}
+cox_fit_multi %>% cox.zph()
+```
+
+
